@@ -28,11 +28,23 @@ public:
     int getOutputTensorCount();
     String getInputName(int idx);
     String getOutputName(int idx);
-    std::vector<int> getInputDims(int idx);
-    std::vector<int> getOutputDims(int idx);
+    std::vector<int64_t> getInputDims(int idx);
+    std::vector<int64_t> getOutputDims(int idx);
 
 private:
     OnnxParserCtx0* m_ctx {nullptr};
 };
+
+template<typename T>
+static inline String formatDims(const std::vector<T>& vec, CString sep = "x"){
+    String str;
+    for(size_t i = 0 ; i < vec.size() ; ++i){
+        str.append(std::to_string(vec[i]));
+        if(i != vec.size() - 1){
+            str.append(sep);
+        }
+    }
+    return str;
+}
 
 }

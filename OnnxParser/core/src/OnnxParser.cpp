@@ -14,6 +14,32 @@ using namespace h7_onnx;
 
 namespace h7_onnx {
 
+static inline void print_dim(const ::onnx::TensorShapeProto_Dimension &dim)
+{
+    switch (dim.value_case())
+    {
+    case onnx::TensorShapeProto_Dimension::ValueCase::kDimParam:
+        std::cout << dim.dim_param() << std::endl;
+        break;
+    case onnx::TensorShapeProto_Dimension::ValueCase::kDimValue:
+        std::cout << dim.dim_value() << std::endl;
+        break;
+    default:
+        assert(false && "should never happen");
+    }
+}
+static inline long long getDimImpl(const ::onnx::TensorShapeProto_Dimension &dim){
+    switch (dim.value_case())
+    {
+    case onnx::TensorShapeProto_Dimension::ValueCase::kDimValue:
+        return dim.dim_value();
+
+    case onnx::TensorShapeProto_Dimension::ValueCase::kDimParam:
+    default:
+        return -1;
+    }
+}
+
 class NamedDimension
 {
 public:
@@ -38,8 +64,8 @@ struct TensorItem{
         dims.nbDims = ds.size();
         std::copy(ds.begin(), ds.end(), dims.d);
     }
-    std::vector<int> getDimsVec(){
-        std::vector<int> vec;
+    std::vector<int64_t> getDimsVec(){
+        std::vector<int64_t> vec;
         vec.resize(dims.nbDims);
         memcpy(vec.data(), dims.d, sizeof(int64_t) * dims.nbDims);
         return vec;
@@ -51,13 +77,13 @@ struct OnnxParserCtx0{
     List<TensorItem> outputItems;
     std::vector<onnx2trt::Status> mErrors;
 
-    std::vector<int> getInputDims(int idx){
+    std::vector<int64_t> getInputDims(int idx){
         if(idx >= (int)inputItems.size()){
             return {};
         }
         return inputItems[idx].getDimsVec();
     }
-    std::vector<int> getOutputDims(int idx){
+    std::vector<int64_t> getOutputDims(int idx){
         if(idx >= (int)outputItems.size()){
             return {};
         }
@@ -92,25 +118,34 @@ private:
                     ::ONNX_NAMESPACE::ValueInfoProto const& input){
         item.name = input.name();
         auto const& onnxDtype = input.type().tensor_type();
-        auto& onnxDims = onnxDtype.shape().dim();
         std::vector<int32_t> onnxDimsVec;
-        for (auto const& onnxDim : onnxDims)
         {
-            // For empty dimensions, the ONNX specification says it's a dynamic dimension
-            if (!onnxDim.has_dim_value() && !onnxDim.has_dim_param())
-            {
-                onnxDimsVec.emplace_back(-1);
-            }
-            else
-            {
-                if (!onnxDim.dim_param().empty())
-                {
-                    namedDims.emplace_back(static_cast<int32_t>(onnxDimsVec.size()), onnxDim.dim_param());
-                }
-                const int32_t dim = onnxDim.dim_param() == "" ? (onnxDim.dim_value() >= 0 ? onnxDim.dim_value() : -1) : -1;
-                onnxDimsVec.emplace_back(dim);
+            printf("name = %s\n", item.name.data());
+            int c = onnxDtype.shape().dim_size();
+            for(int i = 0 ; i < c ; ++i){
+                auto dim = onnxDtype.shape().dim(i);
+                //print_dim(dim);
+                onnxDimsVec.push_back(getDimImpl(dim));
             }
         }
+        //auto& onnxDims = onnxDtype.shape().dim();
+//        for (auto const& onnxDim : onnxDims)
+//        {
+//            // For empty dimensions, the ONNX specification says it's a dynamic dimension
+//            if (!onnxDim.has_dim_value() && !onnxDim.has_dim_param())
+//            {
+//                onnxDimsVec.emplace_back(-1);
+//            }
+//            else
+//            {
+//                if (!onnxDim.dim_param().empty())
+//                {
+//                    namedDims.emplace_back(static_cast<int32_t>(onnxDimsVec.size()), onnxDim.dim_param());
+//                }
+//                const int32_t dim = onnxDim.dim_param() == "" ? (onnxDim.dim_value() >= 0 ? onnxDim.dim_value() : -1) : -1;
+//                onnxDimsVec.emplace_back(dim);
+//            }
+//        }
         item.setDims(onnxDimsVec);
     }
 };
@@ -157,10 +192,10 @@ bool OnnxParser::parseFromData(const void* data, size_t len){
     }
     return true;
 }
-std::vector<int> OnnxParser::getInputDims(int idx){
+std::vector<int64_t> OnnxParser::getInputDims(int idx){
     return m_ctx->getInputDims(idx);
 }
-std::vector<int> OnnxParser::getOutputDims(int idx){
+std::vector<int64_t> OnnxParser::getOutputDims(int idx){
     return m_ctx->getOutputDims(idx);
 }
 int OnnxParser::getInputTensorCount(){

@@ -588,7 +588,7 @@ if(BUILD_ONNX_PYTHON)
     target_link_libraries(onnx_cpp2py_export
                           PRIVATE "-Wl,--whole-archive" $<TARGET_FILE:onnx>
                                   "-Wl,--no-whole-archive")
-    # Prevent "undefined symbol: _ZNSt10filesystem7__cxx114path14_M_split_cmptsEv" 
+    # Prevent "undefined symbol: _ZNSt10filesystem7__cxx114path14_M_split_cmptsEv"
     # (std::filesystem::__cxx11::path::_M_split_cmpts()) on gcc 8
     if (CMAKE_CXX_STANDARD EQUAL 17 AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
       target_link_libraries(onnx_cpp2py_export PRIVATE "-lstdc++fs")
@@ -745,7 +745,7 @@ if(ONNX_USE_UNITY_BUILD)
   # If ONNX_USE_UNITY_BUILD is set to ON, set onnx target to use Unity builds.
   #  We set Unity build to use groups, it allows us to set some specific files to be compiled individually
   set_target_properties(onnx
-    PROPERTIES 
+    PROPERTIES
       UNITY_BUILD ON
       UNITY_BUILD_MODE GROUP
   )

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(OnnxParser LANGUAGES CXX)
+project(OnnxParser LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,6 +24,7 @@ else()
 endif()
 
 # sub
+include_directories(./)
 add_subdirectory(third_party/onnx)
 add_subdirectory(core/)
 
