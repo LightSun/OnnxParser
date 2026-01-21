@@ -120,7 +120,7 @@ private:
         auto const& onnxDtype = input.type().tensor_type();
         std::vector<int32_t> onnxDimsVec;
         {
-            printf("name = %s\n", item.name.data());
+            //printf("name = %s\n", item.name.data());
             int c = onnxDtype.shape().dim_size();
             for(int i = 0 ; i < c ; ++i){
                 auto dim = onnxDtype.shape().dim(i);

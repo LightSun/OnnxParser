@@ -7,9 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(cmake/ENV.cmake)
-
-##
-
+#
 # Find protobuf if it's not a target.
 if (NOT TARGET protobuf::libprotobuf)
   FIND_PACKAGE(Protobuf REQUIRED)
@@ -25,7 +23,9 @@ endif()
 
 # sub
 include_directories(./)
+include_directories(optimizer/)
 add_subdirectory(third_party/onnx)
+add_subdirectory(optimizer)
 add_subdirectory(core/)
 
 #add_executable(OnnxParser main.cpp)

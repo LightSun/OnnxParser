@@ -35,4 +35,8 @@ file(GLOB_RECURSE SRC_PARSER_DEMO
 add_executable(test_OnnxParser
     ${SRC_PARSER_DEMO}
     )
-target_link_libraries(test_OnnxParser PUBLIC ${nvonnxparser_lib_name})
+target_link_libraries(test_OnnxParser
+    PUBLIC
+    ${nvonnxparser_lib_name}
+    onnx_optimizer
+    )
