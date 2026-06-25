@@ -18,6 +18,16 @@ int main(int argc, const char* argv[])
     if(argc > 1){
         file = argv[1];
     }
+    //xx --modify_weights 0.2 <in_onnx> <out_onnx>
+    if(file == "--modify_weights"){
+        if(argc < 5){
+            fprintf(stderr, "modify_weights >> format must be like"
+                            " '<exe> --modify_weights 0.2 <in_onnx> <out_onnx>'.\n");
+            return -1;
+        }
+        float val = std::stof(argv[2]);
+        return h7_onnx::modifyOnnxWeights(argv[3], argv[4], val);
+    }
 
     OnnxParser parser;
     if(!parser.parseFromFile(file)){

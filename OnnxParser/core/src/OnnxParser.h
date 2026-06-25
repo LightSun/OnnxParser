@@ -35,6 +35,8 @@ private:
     OnnxParserCtx0* m_ctx {nullptr};
 };
 
+int modifyOnnxWeights(CString srcOnnx, CString dstOnnx,float val);
+
 template<typename T>
 static inline String formatDims(const std::vector<T>& vec, CString sep = "x"){
     String str;
